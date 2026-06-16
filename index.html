@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Aorbub — Business Tools Suite</title>
+<meta name="description" content="Aorbub is a suite of tools designed for product managers, founders, and business operators who make data-driven decisions."/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%236366f1'/></svg>"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080808;--surface:#111111;--border:rgba(255,255,255,0.06);
+  --accent:#6366f1;--accent-glow:rgba(99,102,241,0.15);
+  --text:#f5f5f5;--text-sec:#a1a1aa;--text-muted:#52525b;
+}
+html{scroll-behavior:smooth;font-family:'Inter',sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+}
+a{text-decoration:none;color:inherit;transition:color .2s}
+img{max-width:100%}
+/* NAVBAR */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;height:64px;
+  background:rgba(8,8,8,0.8);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  transition:border-bottom .3s;
+}
+nav.scrolled{border-bottom:1px solid var(--border)}
+.nav-logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;color:var(--text)}
+.logo-icon{width:28px;height:28px;display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.logo-dot{background:var(--accent);border-radius:3px}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-links a{color:var(--text-sec);font-size:14px;font-weight:500}
+.nav-links a:hover{color:var(--text)}
+.btn-launch{padding:8px 20px;border:1px solid var(--accent);border-radius:8px;
+  color:var(--accent);font-size:14px;font-weight:500;transition:all .2s;background:transparent}
+.btn-launch:hover{background:rgba(99,102,241,0.1);color:#fff}
+/* HERO */
+#hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:100px 24px 60px;position:relative;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none}
+.blob-1{width:500px;height:500px;background:rgba(99,102,241,0.12);top:-10%;right:-5%;
+  animation:blob1 20s infinite ease-in-out}
+.blob-2{width:400px;height:400px;background:rgba(139,92,246,0.08);bottom:-5%;left:-5%;
+  animation:blob2 20s infinite ease-in-out}
+@keyframes blob1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-30px,20px) scale(1.05)}}
+@keyframes blob2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(20px,-25px) scale(1.08)}}
+.hero-content{position:relative;z-index:1;animation:fadeUp .6s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;
+  border:1px solid var(--accent);border-radius:999px;color:var(--accent);
+  font-size:13px;font-weight:500;margin-bottom:32px}
+.badge-dot{width:6px;height:6px;background:var(--accent);border-radius:50%;
+  animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+h1{font-size:clamp(36px,6vw,72px);font-weight:800;line-height:1.1;letter-spacing:-.03em;margin-bottom:24px}
+h1 .accent{color:var(--accent)}
+.hero-sub{font-size:18px;color:var(--text-sec);max-width:520px;margin:0 auto 40px;line-height:1.7}
+.cta-group{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+.btn-primary{padding:12px 28px;background:var(--accent);color:#fff;border-radius:10px;
+  font-size:15px;font-weight:600;border:none;cursor:pointer;transition:all .2s}
+.btn-primary:hover{background:#4f52d9;transform:translateY(-1px);box-shadow:0 8px 24px rgba(99,102,241,0.3)}
+.btn-ghost{padding:12px 28px;border:1px solid var(--border);color:var(--text-sec);border-radius:10px;
+  font-size:15px;font-weight:500;transition:all .2s}
+.btn-ghost:hover{border-color:var(--text-sec);color:var(--text)}
+.hero-meta{font-size:13px;color:var(--text-muted)}
+.scroll-indicator{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);
+  color:var(--text-muted);animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+/* SECTION STYLES */
+section{padding:100px 40px}
+.section-inner{max-width:1100px;margin:0 auto}
+.section-label{font-size:11px;font-weight:600;letter-spacing:.12em;color:var(--accent);
+  text-transform:uppercase;margin-bottom:16px}
+.section-heading{font-size:clamp(28px,4vw,44px);font-weight:800;letter-spacing:-.02em;margin-bottom:16px;line-height:1.15}
+.section-sub{color:var(--text-sec);font-size:16px;max-width:500px;line-height:1.7}
+/* PRODUCTS */
+#products{padding-top:80px}
+.products-header{text-align:center;margin-bottom:64px}
+.products-header .section-sub{margin:0 auto}
+.products-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.product-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:28px;transition:all .2s ease;cursor:pointer;display:flex;flex-direction:column;gap:16px}
+.product-card:hover{border-color:rgba(99,102,241,0.4);box-shadow:0 0 40px rgba(99,102,241,0.1);transform:translateY(-4px)}
+.card-icon{width:44px;height:44px;border-radius:10px;background:rgba(99,102,241,0.1);
+  display:flex;align-items:center;justify-content:center;font-size:22px}
+.card-tag{display:inline-block;padding:3px 10px;border-radius:999px;
+  font-size:11px;font-weight:500;color:var(--text-muted);border:1px solid var(--border)}
+.card-name{font-size:20px;font-weight:700;color:var(--text)}
+.card-desc{font-size:14px;color:var(--text-sec);line-height:1.65;flex:1}
+.card-link{font-size:13px;font-weight:500;color:var(--accent);margin-top:auto;transition:gap .2s;display:flex;align-items:center;gap:6px}
+.card-link:hover{gap:10px}
+.bottom-row{display:flex;justify-content:center;gap:20px;grid-column:1/-1;margin-top:0}
+.bottom-row .product-card{max-width:340px;width:100%}
+/* STATS */
+#stats{background:#0d0d0d;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:64px 40px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);max-width:900px;margin:0 auto;
+  text-align:center;gap:40px}
+.stat-num{font-size:52px;font-weight:800;color:var(--accent);letter-spacing:-.03em;line-height:1}
+.stat-label{font-size:14px;color:var(--text-muted);margin-top:8px}
+/* ABOUT */
+#about .section-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.about-text p{color:var(--text-sec);font-size:15px;line-height:1.8;margin-bottom:16px}
+.about-links{display:flex;gap:20px;margin-top:28px;flex-wrap:wrap}
+.about-link{display:flex;align-items:center;gap:8px;color:var(--text-sec);font-size:14px;font-weight:500;
+  transition:color .2s}
+.about-link:hover{color:var(--text)}
+.about-link svg{width:16px;height:16px;color:var(--accent)}
+.about-visual{animation:float 4s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.showcase-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;overflow:hidden}
+.showcase-title{font-size:12px;font-weight:600;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px}
+.showcase-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;
+  cursor:pointer;transition:all .2s;border-left:2px solid transparent}
+.showcase-item:hover,.showcase-item.active{background:rgba(99,102,241,0.06);border-left-color:var(--accent)}
+.showcase-item-icon{font-size:18px}
+.showcase-item-name{font-size:14px;font-weight:500;color:var(--text-sec)}
+.showcase-item:hover .showcase-item-name,.showcase-item.active .showcase-item-name{color:var(--text)}
+/* CONTACT */
+#contact{text-align:center}
+#contact .section-heading{margin-bottom:12px}
+#contact .section-sub{margin:0 auto 40px;max-width:420px}
+.email-row{display:inline-flex;align-items:center;gap:12px;margin-bottom:40px;
+  background:var(--surface);border:1px solid var(--border);padding:14px 24px;border-radius:12px}
+.email-link{font-size:20px;font-weight:600;color:var(--accent);transition:color .2s}
+.email-link:hover{color:#818cf8}
+.copy-btn{background:none;border:1px solid var(--border);color:var(--text-muted);
+  padding:6px 10px;border-radius:8px;cursor:pointer;font-size:12px;transition:all .2s;display:flex;align-items:center;gap:5px}
+.copy-btn:hover{border-color:var(--accent);color:var(--accent)}
+.social-links{display:flex;gap:16px;justify-content:center}
+.social-btn{width:44px;height:44px;border:1px solid var(--border);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:all .2s}
+.social-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(99,102,241,0.08)}
+.social-btn svg{width:18px;height:18px}
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:32px 40px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;background:var(--bg)}
+.footer-left{color:var(--text-muted);font-size:13px}
+.footer-left strong{color:var(--text-sec);font-weight:600;margin-right:8px}
+.footer-nav{display:flex;gap:24px}
+.footer-nav a{color:var(--text-muted);font-size:13px;transition:color .2s}
+.footer-nav a:hover{color:var(--text)}
+.footer-icons{display:flex;gap:12px}
+.footer-icons a{color:var(--text-muted);transition:color .2s}
+.footer-icons a:hover{color:var(--text)}
+.footer-icons svg{width:16px;height:16px}
+/* RESPONSIVE */
+@media(max-width:768px){
+  nav{padding:0 20px}
+  .nav-links{display:none}
+  section{padding:70px 20px}
+  #stats{padding:50px 20px}
+  .stats-grid{grid-template-columns:repeat(2,1fr);gap:24px}
+  .products-grid{grid-template-columns:1fr}
+  .bottom-row{flex-direction:column;align-items:center}
+  .bottom-row .product-card{max-width:100%}
+  #about .section-inner{grid-template-columns:1fr}
+  footer{flex-direction:column;text-align:center;padding:24px 20px}
+  .email-link{font-size:15px}
+  .email-row{flex-wrap:wrap;justify-content:center}
+}
+@media(max-width:1024px) and (min-width:769px){
+  .products-grid{grid-template-columns:repeat(2,1fr)}
+  .bottom-row{grid-column:1/-1}
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">
+    <div class="logo-icon">
+      <div class="logo-dot"></div>
+      <div class="logo-dot"></div>
+      <div class="logo-dot"></div>
+      <div class="logo-dot"></div>
+    </div>
+    Aorbub
+  </a>
+  <div class="nav-links">
+    <a href="#products">Products</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <a href="https://tijarah.aorbub.com" target="_blank" class="btn-launch">Launch App</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="hero-content">
+    <div class="badge">
+      <span class="badge-dot"></span>
+      Business Tools Suite
+    </div>
+    <h1>Build smarter.<br><span class="accent">Decide faster.</span></h1>
+    <p class="hero-sub">Aorbub is a suite of tools designed for product managers, founders, and business operators who make data-driven decisions.</p>
+    <div class="cta-group">
+      <a href="#products" class="btn-primary">Explore Tools</a>
+      <a href="https://github.com/HuzefaH10" target="_blank" class="btn-ghost">View on GitHub</a>
+    </div>
+    <p class="hero-meta">5 tools · Built by Huzefa Haveliwala</p>
+  </div>
+  <div class="scroll-indicator">
+    <i data-lucide="chevron-down" style="width:24px;height:24px"></i>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section id="products">
+  <div class="section-inner">
+    <div class="products-header">
+      <div class="section-label">Products</div>
+      <h2 class="section-heading">Everything you need to make better decisions</h2>
+      <p class="section-sub">Five standalone tools, each solving a specific business problem.</p>
+    </div>
+    <div class="products-grid" id="products-grid">
+      <!-- Top 3 cards -->
+      <div class="product-card" onclick="window.open('https://tijarah.aorbub.com','_blank')">
+        <div class="card-icon">🏢</div>
+        <div><span class="card-tag">SaaS Management</span></div>
+        <div class="card-name">Aorbub Tijarah</div>
+        <div class="card-desc">Multi-business management platform with inventory, sales, analytics, and team management.</div>
+        <a href="https://tijarah.aorbub.com" target="_blank" class="card-link">Open Tool <i data-lucide="arrow-right" style="width:14px;height:14px"></i></a>
+      </div>
+      <div class="product-card" onclick="window.open('https://priority.aorbub.com','_blank')">
+        <div class="card-icon">🎯</div>
+        <div><span class="card-tag">Product Management</span></div>
+        <div class="card-name">PriorityIQ</div>
+        <div class="card-desc">RICE-based feature prioritization tool for product managers and roadmap planning.</div>
+        <a href="https://priority.aorbub.com" target="_blank" class="card-link">Open Tool <i data-lucide="arrow-right" style="width:14px;height:14px"></i></a>
+      </div>
+      <div class="product-card" onclick="window.open('https://ab.aorbub.com','_blank')">
+        <div class="card-icon">📊</div>
+        <div><span class="card-tag">Analytics</span></div>
+        <div class="card-name">A/B Test Calculator</div>
+        <div class="card-desc">Statistical significance calculator for A/B tests with confidence intervals and sample size planning.</div>
+        <a href="https://ab.aorbub.com" target="_blank" class="card-link">Open Tool <i data-lucide="arrow-right" style="width:14px;height:14px"></i></a>
+      </div>
+    </div>
+    <!-- Bottom 2 centered -->
+    <div class="bottom-row" style="display:flex;justify-content:center;gap:20px;margin-top:20px">
+      <div class="product-card" style="max-width:340px;width:100%" onclick="window.open('https://pricing.aorbub.com','_blank')">
+        <div class="card-icon">💰</div>
+        <div><span class="card-tag">Business Strategy</span></div>
+        <div class="card-name">PricingIQ</div>
+        <div class="card-desc">Real-time pricing strategy simulator comparing cost-plus, competitor-based, and value-based models.</div>
+        <a href="https://pricing.aorbub.com" target="_blank" class="card-link">Open Tool <i data-lucide="arrow-right" style="width:14px;height:14px"></i></a>
+      </div>
+      <div class="product-card" style="max-width:340px;width:100%" onclick="window.open('https://churn.aorbub.com','_blank')">
+        <div class="card-icon">🛡️</div>
+        <div><span class="card-tag">Customer Success</span></div>
+        <div class="card-name">ChurnIQ</div>
+        <div class="card-desc">Subscription churn risk analyzer that identifies at-risk customers and recommends retention actions.</div>
+        <a href="https://churn.aorbub.com" target="_blank" class="card-link">Open Tool <i data-lucide="arrow-right" style="width:14px;height:14px"></i></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div id="stats">
+  <div class="stats-grid">
+    <div><div class="stat-num">5</div><div class="stat-label">Tools Built</div></div>
+    <div><div class="stat-num">11+</div><div class="stat-label">Projects Planned</div></div>
+    <div><div class="stat-num">1</div><div class="stat-label">Developer</div></div>
+    <div><div class="stat-num">100%</div><div class="stat-label">Vibe Coded</div></div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-inner">
+    <div class="about-text">
+      <div class="section-label">About</div>
+      <h2 class="section-heading">Built by one person.<br>Designed for everyone.</h2>
+      <div style="margin-top:24px">
+        <p>Aorbub is an independent suite of business tools built by Huzefa Haveliwala — a product builder based in Kuwait with a background in software testing, business operations, and AI-assisted development.</p>
+        <p>Each tool in the Aorbub suite solves a real business problem — from managing inventory and tracking churn to making smarter pricing and product decisions.</p>
+        <p>Built using React, Firebase, and modern AI development tools. Aorbub is an ongoing project with more tools planned.</p>
+      </div>
+      <div class="about-links">
+        <a href="https://linkedin.com/in/huzefa-haveliwala" target="_blank" class="about-link">
+          <i data-lucide="linkedin" style="width:16px;height:16px;color:#6366f1"></i> Connect on LinkedIn
+        </a>
+        <a href="https://github.com/HuzefaH10" target="_blank" class="about-link">
+          <i data-lucide="github" style="width:16px;height:16px;color:#6366f1"></i> View on GitHub
+        </a>
+      </div>
+    </div>
+    <div class="about-visual">
+      <div class="showcase-card">
+        <div class="showcase-title">Product Suite</div>
+        <div class="showcase-item active" id="sc-1"><span class="showcase-item-icon">🏢</span><span class="showcase-item-name">Aorbub Tijarah</span></div>
+        <div class="showcase-item" id="sc-2"><span class="showcase-item-icon">🎯</span><span class="showcase-item-name">PriorityIQ</span></div>
+        <div class="showcase-item" id="sc-3"><span class="showcase-item-icon">📊</span><span class="showcase-item-name">A/B Test Calculator</span></div>
+        <div class="showcase-item" id="sc-4"><span class="showcase-item-icon">💰</span><span class="showcase-item-name">PricingIQ</span></div>
+        <div class="showcase-item" id="sc-5"><span class="showcase-item-icon">🛡️</span><span class="showcase-item-name">ChurnIQ</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-inner" style="text-align:center">
+    <div class="section-label" style="justify-content:center;display:flex">Contact</div>
+    <h2 class="section-heading">Get in touch</h2>
+    <p class="section-sub">Have a question, collaboration idea, or just want to say hi?</p>
+    <div class="email-row">
+      <a href="mailto:huzefa@aorbub.com" class="email-link">huzefa@aorbub.com</a>
+      <button class="copy-btn" id="copy-btn" onclick="copyEmail()">
+        <i data-lucide="copy" style="width:13px;height:13px"></i> Copy
+      </button>
+    </div>
+    <div class="social-links">
+      <a href="https://linkedin.com/in/huzefa-haveliwala" target="_blank" class="social-btn" title="LinkedIn">
+        <i data-lucide="linkedin"></i>
+      </a>
+      <a href="https://github.com/HuzefaH10" target="_blank" class="social-btn" title="GitHub">
+        <i data-lucide="github"></i>
+      </a>
+      <a href="mailto:huzefa@aorbub.com" class="social-btn" title="Email">
+        <i data-lucide="mail"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left"><strong>Aorbub</strong>© 2026 Huzefa Haveliwala</div>
+  <nav class="footer-nav">
+    <a href="#products">Products</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <div class="footer-icons">
+    <a href="https://linkedin.com/in/huzefa-haveliwala" target="_blank"><i data-lucide="linkedin"></i></a>
+    <a href="https://github.com/HuzefaH10" target="_blank"><i data-lucide="github"></i></a>
+  </div>
+</footer>
+
+<script>
+// Init Lucide icons
+lucide.createIcons();
+
+// Navbar scroll border
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 10);
+});
+
+// Copy email
+function copyEmail() {
+  navigator.clipboard.writeText('huzefa@aorbub.com').then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.innerHTML = '<i data-lucide="check" style="width:13px;height:13px"></i> Copied!';
+    btn.style.color = '#6366f1';
+    btn.style.borderColor = '#6366f1';
+    lucide.createIcons();
+    setTimeout(() => {
+      btn.innerHTML = '<i data-lucide="copy" style="width:13px;height:13px"></i> Copy';
+      btn.style.color = '';
+      btn.style.borderColor = '';
+      lucide.createIcons();
+    }, 2000);
+  });
+}
+
+// Showcase card rotation
+const items = document.querySelectorAll('.showcase-item');
+let current = 0;
+setInterval(() => {
+  items[current].classList.remove('active');
+  current = (current + 1) % items.length;
+  items[current].classList.add('active');
+}, 2000);
+
+// Mobile bottom row fix
+function fixBottomRow() {
+  const row = document.querySelector('.bottom-row');
+  if (window.innerWidth < 769) {
+    row.style.flexDirection = 'column';
+    row.style.alignItems = 'center';
+    row.querySelectorAll('.product-card').forEach(c => c.style.maxWidth = '100%');
+  } else {
+    row.style.flexDirection = '';
+    row.style.alignItems = '';
+    row.querySelectorAll('.product-card').forEach(c => c.style.maxWidth = '340px');
+  }
+}
+fixBottomRow();
+window.addEventListener('resize', fixBottomRow);
+</script>
+</body>
+</html>

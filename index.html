@@ -139,14 +139,16 @@ section{padding:100px 40px}
 .products-header{text-align:center;margin-bottom:64px}
 .products-header .section-sub{margin:0 auto}
 .products-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.product-card{background:var(--surface);border:1px solid var(--border);border-top:2px solid transparent;border-radius:16px;
-  padding:28px;transition:all .2s ease;cursor:pointer;display:flex;flex-direction:column;gap:16px}
-.product-card:hover{border-color:rgba(99,102,241,0.4);box-shadow:0 0 40px rgba(99,102,241,0.1);transform:translateY(-4px)}
-.ca-indigo{border-top-color:rgba(99,102,241,0.5)}.ca-indigo:hover{border-top-color:rgba(99,102,241,1)}
-.ca-violet{border-top-color:rgba(139,92,246,0.5)}.ca-violet:hover{border-top-color:rgba(139,92,246,1)}
-.ca-blue{border-top-color:rgba(59,130,246,0.5)}.ca-blue:hover{border-top-color:rgba(59,130,246,1)}
-.ca-emerald{border-top-color:rgba(16,185,129,0.5)}.ca-emerald:hover{border-top-color:rgba(16,185,129,1)}
-.ca-sky{border-top-color:rgba(14,165,233,0.5)}.ca-sky:hover{border-top-color:rgba(14,165,233,1)}
+.product-card{background:var(--surface);border:1px solid rgba(255,255,255,0.08);border-radius:16px;
+  padding:28px;transition:all .3s ease;cursor:pointer;display:flex;flex-direction:column;gap:16px}
+.product-card:hover{box-shadow:0 20px 40px rgba(0,0,0,0.4);transform:translateY(-4px)}
+.ca-tijarah:hover{border-color:#6366f1}
+.ca-priority:hover{border-color:#8b5cf6}
+.ca-ab:hover{border-color:#06b6d4}
+.ca-pricing:hover{border-color:#f59e0b}
+.ca-churn:hover{border-color:#10b981}
+.tool-preview{max-height:0;overflow:hidden;transition:max-height 0.3s ease, opacity 0.3s ease;font-size:13px;color:#a1a1aa;opacity:0;font-weight:500;}
+.product-card:hover .tool-preview{max-height:56px;opacity:1}
 .card-icon{width:44px;height:44px;border-radius:10px;background:rgba(99,102,241,0.1);
   display:flex;align-items:center;justify-content:center;font-size:22px}
 .card-tag{display:inline-block;padding:3px 10px;border-radius:999px;
@@ -322,43 +324,48 @@ footer{border-top:1px solid var(--border);padding:32px max(40px,5vw);
     </div>
     <div class="products-grid" id="products-grid">
       <!-- Top 3 cards -->
-      <div class="product-card ca-indigo" onclick="window.open('https://tijarah.aorbub.com','_blank')">
+      <div class="product-card ca-tijarah" onclick="window.open('https://tijarah.aorbub.com','_blank')">
         <div class="card-icon">🏢</div>
         <div><span class="card-tag">SaaS Management</span></div>
         <div class="card-name">Aorbub Tijarah</div>
         <div class="card-desc">Multi-business management platform with inventory, sales, analytics, and team management.</div>
         <a href="https://tijarah.aorbub.com" target="_blank" class="card-link">Open Tool <i data-lucide="arrow-right" style="width:14px;height:14px"></i></a>
+        <div class="tool-preview">Manage inventory, sales & staff across multiple branches</div>
       </div>
-      <div class="product-card ca-violet" onclick="window.open('https://priority.aorbub.com','_blank')">
+      <div class="product-card ca-priority" onclick="window.open('https://priority.aorbub.com','_blank')">
         <div class="card-icon">🎯</div>
         <div><span class="card-tag">Product Management</span></div>
         <div class="card-name">PriorityIQ</div>
         <div class="card-desc">RICE-based feature prioritization tool for product managers and roadmap planning.</div>
         <a href="https://priority.aorbub.com" target="_blank" class="card-link">Open Tool <i data-lucide="arrow-right" style="width:14px;height:14px"></i></a>
+        <div class="tool-preview">Score 10 features by RICE in under 60 seconds</div>
       </div>
-      <div class="product-card ca-blue" onclick="window.open('https://ab.aorbub.com','_blank')">
+      <div class="product-card ca-ab" onclick="window.open('https://ab.aorbub.com','_blank')">
         <div class="card-icon">📊</div>
         <div><span class="card-tag">Analytics</span></div>
         <div class="card-name">A/B Test Calculator</div>
         <div class="card-desc">Statistical significance calculator for A/B tests with confidence intervals and sample size planning.</div>
         <a href="https://ab.aorbub.com" target="_blank" class="card-link">Open Tool <i data-lucide="arrow-right" style="width:14px;height:14px"></i></a>
+        <div class="tool-preview">Know if your result is significant before shipping</div>
       </div>
     </div>
     <!-- Bottom 2 centered -->
     <div class="bottom-row" style="display:flex;justify-content:center;gap:20px;margin-top:20px">
-      <div class="product-card ca-emerald" style="max-width:340px;width:100%" onclick="window.open('https://pricing.aorbub.com','_blank')">
+      <div class="product-card ca-pricing" style="max-width:340px;width:100%" onclick="window.open('https://pricing.aorbub.com','_blank')">
         <div class="card-icon">💰</div>
         <div><span class="card-tag">Business Strategy</span></div>
         <div class="card-name">PricingIQ</div>
         <div class="card-desc">Real-time pricing strategy simulator comparing cost-plus, competitor-based, and value-based models.</div>
         <a href="https://pricing.aorbub.com" target="_blank" class="card-link">Open Tool <i data-lucide="arrow-right" style="width:14px;height:14px"></i></a>
+        <div class="tool-preview">Compare 3 pricing models side-by-side instantly</div>
       </div>
-      <div class="product-card ca-sky" style="max-width:340px;width:100%" onclick="window.open('https://churn.aorbub.com','_blank')">
+      <div class="product-card ca-churn" style="max-width:340px;width:100%" onclick="window.open('https://churn.aorbub.com','_blank')">
         <div class="card-icon">🛡️</div>
         <div><span class="card-tag">Customer Success</span></div>
         <div class="card-name">ChurnIQ</div>
         <div class="card-desc">Subscription churn risk analyzer that identifies at-risk customers and recommends retention actions.</div>
         <a href="https://churn.aorbub.com" target="_blank" class="card-link">Open Tool <i data-lucide="arrow-right" style="width:14px;height:14px"></i></a>
+        <div class="tool-preview">Identify your top 5 churn-risk accounts today</div>
       </div>
     </div>
   </div>

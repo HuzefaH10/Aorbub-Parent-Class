@@ -5,9 +5,37 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Aorbub — Business Tools Suite</title>
 <meta name="description" content="Aorbub is a suite of tools designed for product managers, founders, and business operators who make data-driven decisions."/>
+<!-- OG Tags -->
+<meta property="og:title" content="Aorbub — Business Tools Suite" />
+<meta property="og:description" content="Aorbub is a suite of tools designed for product managers, founders, and business operators who make data-driven decisions." />
+<meta property="og:image" content="https://aorbub.com/og-image.jpg" />
+<meta property="og:url" content="https://aorbub.com" />
+<meta property="og:type" content="website" />
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Aorbub — Business Tools Suite" />
+<meta name="twitter:description" content="Aorbub is a suite of tools designed for product managers, founders, and business operators who make data-driven decisions." />
+<meta name="twitter:image" content="https://aorbub.com/og-image.jpg" />
+<!-- Canonical URL -->
+<link rel="canonical" href="https://aorbub.com" />
+<!-- JSON-LD Schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Aorbub",
+  "url": "https://aorbub.com",
+  "description": "Aorbub is a suite of tools designed for product managers, founders, and business operators who make data-driven decisions.",
+  "author": {
+    "@type": "Person",
+    "name": "Huzefa Haveliwala"
+  }
+}
+</script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%236366f1'/></svg>"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="preconnect" href="https://unpkg.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <script src="https://unpkg.com/lucide@latest"></script>
 <style>
@@ -600,7 +628,7 @@ footer{border-top:1px solid var(--border);padding:32px max(40px,5vw);
 </section>
 
 <!-- SCROLL TO TOP -->
-<button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">
+<button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top" aria-label="Back to top">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
 </button>
 
@@ -613,8 +641,8 @@ footer{border-top:1px solid var(--border);padding:32px max(40px,5vw);
     <a href="#contact">Contact</a>
   </nav>
   <div class="footer-icons">
-    <a href="https://linkedin.com/in/huzefa-haveliwala" target="_blank"><i data-lucide="linkedin"></i></a>
-    <a href="https://github.com/HuzefaH10" target="_blank"><i data-lucide="github"></i></a>
+    <a href="https://linkedin.com/in/huzefa-haveliwala" target="_blank" aria-label="LinkedIn Profile"><i data-lucide="linkedin"></i></a>
+    <a href="https://github.com/HuzefaH10" target="_blank" aria-label="GitHub Profile"><i data-lucide="github"></i></a>
   </div>
 </footer>
 

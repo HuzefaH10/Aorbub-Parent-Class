@@ -152,6 +152,34 @@ section{padding:100px 40px}
 .card-link:hover{gap:10px}
 .bottom-row{display:flex;justify-content:center;gap:20px;grid-column:1/-1;margin-top:0}
 .bottom-row .product-card{max-width:340px;width:100%}
+/* DEMO */
+.demo-card {
+  background: #111111; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px;
+  padding: 48px; width: 100%; max-width: 860px; margin: 0 auto;
+}
+.demo-tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 32px; flex-wrap: wrap; }
+.demo-tab {
+  background: transparent; border: 1px solid var(--border); color: var(--text-sec);
+  padding: 8px 16px; border-radius: 999px; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.2s;
+}
+.demo-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.demo-tab:hover:not(.active) { border-color: rgba(255,255,255,0.2); color: var(--text); }
+.demo-pane { display: none; flex-direction: column; gap: 20px; max-width: 400px; margin: 0 auto; }
+.demo-pane.active { display: flex; animation: fade-in 0.3s ease; }
+@keyframes fade-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+.demo-input-group { display: flex; align-items: center; gap: 16px; }
+.demo-input-group label { width: 150px; font-size: 13px; color: var(--text-sec); flex-shrink: 0; text-align: left; }
+.demo-input-group input[type="range"] { flex: 1; accent-color: var(--accent); cursor: pointer; }
+.demo-input-group span { width: 48px; text-align: right; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.demo-result { text-align: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; }
+.demo-cta {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(99,102,241,0.1); color: var(--accent);
+  padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 500;
+  text-decoration: none; margin-top: 8px; transition: background 0.2s; align-self: center;
+}
+.demo-cta:hover { background: rgba(99,102,241,0.2); }
 /* HIGHLIGHTS */
 #highlights{background:#0d0d0d;border-top:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);padding:64px 40px}
 .highlights-grid{display:grid;grid-template-columns:repeat(4,1fr);max-width:1100px;margin:0 auto;gap:40px}
@@ -327,6 +355,78 @@ footer{border-top:1px solid var(--border);padding:32px max(40px,5vw);
         <div class="card-name">ChurnIQ</div>
         <div class="card-desc">Subscription churn risk analyzer that identifies at-risk customers and recommends retention actions.</div>
         <a href="https://churn.aorbub.com" target="_blank" class="card-link">Open Tool <i data-lucide="arrow-right" style="width:14px;height:14px"></i></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section id="demo" style="padding-top:0;">
+  <div class="section-inner" style="display:flex; flex-direction:column; align-items:center;">
+    <div class="demo-card">
+      <div class="section-label" style="justify-content:center;display:flex">LIVE PREVIEW</div>
+      <h2 class="section-heading" style="text-align:center; font-size:24px; margin-bottom:32px;">Try before you commit.</h2>
+      
+      <div class="demo-tabs">
+        <button class="demo-tab active" onclick="switchDemo('pricing', event)">PricingIQ</button>
+        <button class="demo-tab" onclick="switchDemo('ab', event)">A/B Test</button>
+        <button class="demo-tab" onclick="switchDemo('tijarah', event)">Tijarah</button>
+        <button class="demo-tab" onclick="switchDemo('priority', event)">PriorityIQ</button>
+        <button class="demo-tab" onclick="switchDemo('churn', event)">ChurnIQ</button>
+      </div>
+
+      <div class="demo-content">
+        <!-- PricingIQ Demo -->
+        <div id="demo-pricing" class="demo-pane active">
+          <div class="demo-input-group">
+            <label>Cost</label>
+            <input type="range" id="demo-cost" min="10" max="100" value="50" oninput="updatePricingDemo()">
+            <span id="demo-cost-val">$50</span>
+          </div>
+          <div class="demo-input-group">
+            <label>Target Margin (%)</label>
+            <input type="range" id="demo-margin" min="10" max="80" value="30" oninput="updatePricingDemo()">
+            <span id="demo-margin-val">30%</span>
+          </div>
+          <div class="demo-input-group">
+            <label>Competitor Price</label>
+            <input type="range" id="demo-comp" min="20" max="150" value="70" oninput="updatePricingDemo()">
+            <span id="demo-comp-val">$70</span>
+          </div>
+          <div class="demo-result">
+            Recommended Price: <strong id="demo-rec-price" class="accent">$71.43</strong>
+          </div>
+          <a href="https://pricing.aorbub.com" target="_blank" class="demo-cta">Full tool &rarr;</a>
+        </div>
+
+        <!-- A/B Demo -->
+        <div id="demo-ab" class="demo-pane">
+          <div class="demo-input-group">
+            <label>Control Conv. (%)</label>
+            <input type="range" id="demo-ctrl" min="1" max="20" value="5" step="0.1" oninput="updateAbDemo()">
+            <span id="demo-ctrl-val">5.0%</span>
+          </div>
+          <div class="demo-input-group">
+            <label>Variant Conv. (%)</label>
+            <input type="range" id="demo-var" min="1" max="20" value="6.5" step="0.1" oninput="updateAbDemo()">
+            <span id="demo-var-val">6.5%</span>
+          </div>
+          <div class="demo-result">
+            Significance: <strong id="demo-ab-lift" class="accent">Statistically Significant ✔️</strong>
+          </div>
+          <a href="https://ab.aorbub.com" target="_blank" class="demo-cta">Full tool &rarr;</a>
+        </div>
+
+        <!-- Other Tools -->
+        <div id="demo-tijarah" class="demo-pane" style="text-align:center; padding: 20px 0;">
+          <a href="https://tijarah.aorbub.com" target="_blank" class="demo-cta">Full tool &rarr;</a>
+        </div>
+        <div id="demo-priority" class="demo-pane" style="text-align:center; padding: 20px 0;">
+          <a href="https://priority.aorbub.com" target="_blank" class="demo-cta">Full tool &rarr;</a>
+        </div>
+        <div id="demo-churn" class="demo-pane" style="text-align:center; padding: 20px 0;">
+          <a href="https://churn.aorbub.com" target="_blank" class="demo-cta">Full tool &rarr;</a>
+        </div>
       </div>
     </div>
   </div>
@@ -511,7 +611,48 @@ function fixBottomRow() {
 fixBottomRow();
 window.addEventListener('resize', fixBottomRow);
 
+// Demo Logic
+function switchDemo(id, e) {
+  document.querySelectorAll('.demo-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.demo-pane').forEach(p => p.classList.remove('active'));
+  e.target.classList.add('active');
+  document.getElementById('demo-' + id).classList.add('active');
+}
 
+function updatePricingDemo() {
+  const cost = parseFloat(document.getElementById('demo-cost').value);
+  const margin = parseFloat(document.getElementById('demo-margin').value);
+  document.getElementById('demo-cost-val').textContent = '$' + cost;
+  document.getElementById('demo-margin-val').textContent = margin + '%';
+  document.getElementById('demo-comp-val').textContent = '$' + document.getElementById('demo-comp').value;
+  const recPrice = cost / (1 - (margin / 100));
+  document.getElementById('demo-rec-price').textContent = '$' + recPrice.toFixed(2);
+}
+
+function updateAbDemo() {
+  const ctrl = parseFloat(document.getElementById('demo-ctrl').value);
+  const var_c = parseFloat(document.getElementById('demo-var').value);
+  document.getElementById('demo-ctrl-val').textContent = ctrl.toFixed(1) + '%';
+  document.getElementById('demo-var-val').textContent = var_c.toFixed(1) + '%';
+  
+  const n = 1000;
+  const p1 = ctrl / 100;
+  const p2 = var_c / 100;
+  const se = Math.sqrt((p1*(1-p1)/n) + (p2*(1-p2)/n));
+  const z = (p2 - p1) / se;
+  
+  let result = "Not Significant";
+  if (z > 1.96) result = "Statistically Significant \u2714\ufe0f";
+  else if (z < -1.96) result = "Negative Impact \u274c";
+  if(ctrl === var_c) result = "No Difference";
+
+  document.getElementById('demo-ab-lift').textContent = result;
+}
+
+if(document.getElementById('demo-cost')) {
+  updatePricingDemo();
+  updateAbDemo();
+}
 </script>
 </body>
 </html>

@@ -128,7 +128,7 @@ img{max-width:100%}
   text-align:center;padding:100px 24px 60px;position:relative;overflow:hidden}
 #hero-canvas{
   position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;
-  pointer-events:none;
+  pointer-events:none;display:block;
 }
 .cursor { color: var(--accent); animation: blink 1s step-end infinite; }
 @keyframes blink { 50% { opacity: 0; } }
@@ -143,7 +143,9 @@ img{max-width:100%}
   animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
 h1{font-size:clamp(36px,6vw,72px);font-weight:800;line-height:1.1;letter-spacing:-.03em;margin-bottom:24px}
-h1 .accent{color:var(--accent);background:none;background-color:transparent}
+h1 .accent,#typewriter{color:var(--accent);background:none !important;background-color:transparent !important;
+  -webkit-box-decoration-break:clone;box-decoration-break:clone;
+  text-shadow:none;-webkit-text-fill-color:var(--accent)}
 .hero-sub{font-size:18px;color:var(--text-sec);max-width:520px;margin:0 auto 40px;line-height:1.7}
 .cta-group{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
 .btn-primary{padding:12px 28px;background:var(--accent);color:#fff;border-radius:10px;
@@ -796,7 +798,15 @@ import * as THREE from 'three';
 
   const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setSize(hero.clientWidth, hero.clientHeight);
+  // Use hero container dimensions for sizing
+  function updateRendererSize(){
+    const w = hero.clientWidth || window.innerWidth;
+    const h = hero.clientHeight || window.innerHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  updateRendererSize();
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.2;
   renderer.shadowMap.enabled = false;
@@ -886,11 +896,11 @@ import * as THREE from 'three';
     NODE_COUNT = getNodeCount();
 
     for(let i = 0; i < NODE_COUNT; i++){
-      const x = (Math.random() - 0.5) * 24; // -12 to 12
-      const y = (Math.random() - 0.5) * 12; // -6 to 6
-      const z = -2 - Math.random() * 6;     // -8 to -2
-      const vx = (Math.random() - 0.5) * 0.005;
-      const vy = (Math.random() - 0.5) * 0.005;
+      const x = (Math.random() - 0.5) * 20; // -10 to 10
+      const y = (Math.random() - 0.5) * 10; // -5 to 5
+      const z = -1 - Math.random() * 5;     // -6 to -1 (closer to camera)
+      const vx = (Math.random() - 0.5) * 0.006;
+      const vy = (Math.random() - 0.5) * 0.006;
       const vz = (Math.random() - 0.5) * 0.002;
       nodes.push({ x, y, z, vx, vy, vz });
       const mesh = new THREE.Mesh(nodeGeo, Math.random() > 0.4 ? nodeMat1 : nodeMat2);
@@ -924,9 +934,9 @@ import * as THREE from 'three';
       n.z += n.vz;
 
       // Bounce off boundaries
-      if(n.x < -12 || n.x > 12) n.vx *= -1;
-      if(n.y < -6 || n.y > 6) n.vy *= -1;
-      if(n.z < -8 || n.z > -2) n.vz *= -1;
+      if(n.x < -10 || n.x > 10) n.vx *= -1;
+      if(n.y < -5 || n.y > 5) n.vy *= -1;
+      if(n.z < -6 || n.z > -1) n.vz *= -1;
 
       // Mouse repulsion (project mouse to 3D rough coords)
       if(deviceType !== 'mobile'){
@@ -1133,18 +1143,12 @@ import * as THREE from 'three';
   function onResize(){
     const prevDevice = deviceType;
     deviceType = getDeviceType();
-    const w = hero.clientWidth;
-    const h = hero.clientHeight;
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h);
+    updateRendererSize();
 
     // Handle responsive changes
     if(prevDevice !== deviceType){
       cubeGroup.visible = deviceType !== 'mobile';
-      if(prevDevice !== deviceType){
-        initNodes(); // reinitialize with correct count
-      }
+      initNodes(); // reinitialize with correct count
       if(deviceType === 'mobile'){
         camera.position.x = 0;
         camera.position.y = 0;

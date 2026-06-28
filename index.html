@@ -143,7 +143,7 @@ img{max-width:100%}
   animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
 h1{font-size:clamp(36px,6vw,72px);font-weight:800;line-height:1.1;letter-spacing:-.03em;margin-bottom:24px}
-h1 .accent{color:var(--accent)}
+h1 .accent{color:var(--accent);background:none;background-color:transparent}
 .hero-sub{font-size:18px;color:var(--text-sec);max-width:520px;margin:0 auto 40px;line-height:1.7}
 .cta-group{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
 .btn-primary{padding:12px 28px;background:var(--accent);color:#fff;border-radius:10px;
@@ -782,9 +782,9 @@ import * as THREE from 'three';
   let deviceType = getDeviceType();
 
   function getNodeCount(){
-    if(deviceType === 'mobile') return 25;
-    if(deviceType === 'tablet') return 40;
-    return 60;
+    if(deviceType === 'mobile') return 30;
+    if(deviceType === 'tablet') return 50;
+    return 75;
   }
 
   // --- Scene, Camera, Renderer ---
@@ -802,10 +802,10 @@ import * as THREE from 'three';
   renderer.shadowMap.enabled = false;
 
   // --- Lighting ---
-  const ambientLight = new THREE.AmbientLight(0x1a1a2e, 0.4);
+  const ambientLight = new THREE.AmbientLight(0x1a1a2e, 0.8);
   scene.add(ambientLight);
 
-  const pointLight1 = new THREE.PointLight(0x6366f1, 2, 15);
+  const pointLight1 = new THREE.PointLight(0x6366f1, 3, 15);
   pointLight1.position.set(3, 3, 3);
   scene.add(pointLight1);
 
@@ -832,96 +832,27 @@ import * as THREE from 'three';
   window.addEventListener('mousemove', onMouseMove);
 
   // ============================================================
-  // ELEMENT 1: Floating Dashboard Screen
+  // ELEMENT 1: Floating Dashboard Screen (simplified for visibility)
   // ============================================================
   const dashGroup = new THREE.Group();
 
-  // Monitor body
+  // Monitor body — solid glowing material, no canvas texture
   const monitorGeo = new THREE.BoxGeometry(3.2, 2, 0.08);
   const monitorMat = new THREE.MeshStandardMaterial({
-    color: 0x0f0f1a, metalness: 0.8, roughness: 0.2
+    color: 0x1a1a3e,
+    emissive: 0x6366f1,
+    emissiveIntensity: 0.3,
+    metalness: 0.6,
+    roughness: 0.3
   });
   const monitorMesh = new THREE.Mesh(monitorGeo, monitorMat);
   dashGroup.add(monitorMesh);
 
-  // Screen face — canvas texture
-  function createScreenTexture(){
-    const c = document.createElement('canvas');
-    c.width = 512; c.height = 320;
-    const ctx = c.getContext('2d');
-
-    // Background
-    ctx.fillStyle = '#0a0a14';
-    ctx.fillRect(0, 0, 512, 320);
-
-    // Grid of dots
-    ctx.fillStyle = 'rgba(99,102,241,0.08)';
-    for(let gx = 20; gx < 500; gx += 24){
-      for(let gy = 20; gy < 310; gy += 24){
-        ctx.beginPath();
-        ctx.arc(gx, gy, 1.2, 0, Math.PI*2);
-        ctx.fill();
-      }
-    }
-
-    // 3 horizontal glowing bars (chart bars)
-    const barColors = ['#6366f1','#8b5cf6','#6366f1'];
-    const barWidths = [260, 180, 320];
-    const barY = [100, 155, 210];
-    barColors.forEach(function(col, i){
-      // Glow
-      const grad = ctx.createLinearGradient(60, barY[i], 60 + barWidths[i], barY[i]);
-      grad.addColorStop(0, col);
-      grad.addColorStop(1, col + '44');
-      ctx.fillStyle = grad;
-      ctx.shadowColor = col;
-      ctx.shadowBlur = 18;
-      // Rounded rect helper (roundRect not universally supported)
-      const rx = 60, ry = barY[i], rw = barWidths[i], rh = 28, rr = 6;
-      ctx.beginPath();
-      ctx.moveTo(rx + rr, ry);
-      ctx.lineTo(rx + rw - rr, ry);
-      ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + rr);
-      ctx.lineTo(rx + rw, ry + rh - rr);
-      ctx.quadraticCurveTo(rx + rw, ry + rh, rx + rw - rr, ry + rh);
-      ctx.lineTo(rx + rr, ry + rh);
-      ctx.quadraticCurveTo(rx, ry + rh, rx, ry + rh - rr);
-      ctx.lineTo(rx, ry + rr);
-      ctx.quadraticCurveTo(rx, ry, rx + rr, ry);
-      ctx.closePath();
-      ctx.fill();
-      ctx.shadowBlur = 0;
-    });
-
-    // 2 circle indicators top-right
-    ctx.fillStyle = '#6366f1';
-    ctx.shadowColor = '#6366f1';
-    ctx.shadowBlur = 10;
-    ctx.beginPath(); ctx.arc(420, 50, 8, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle = '#8b5cf6';
-    ctx.shadowColor = '#8b5cf6';
-    ctx.beginPath(); ctx.arc(455, 50, 8, 0, Math.PI*2); ctx.fill();
-    ctx.shadowBlur = 0;
-
-    // Thin horizontal line at top
-    ctx.strokeStyle = 'rgba(99,102,241,0.2)';
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(40, 75); ctx.lineTo(472, 75); ctx.stroke();
-
-    return new THREE.CanvasTexture(c);
-  }
-
-  const screenGeo = new THREE.PlaneGeometry(3.0, 1.85);
-  const screenMat = new THREE.MeshStandardMaterial({
-    map: createScreenTexture(),
-    emissive: 0x6366f1,
-    emissiveIntensity: 0.15,
-    roughness: 0.5,
-    metalness: 0.1
-  });
-  const screenMesh = new THREE.Mesh(screenGeo, screenMat);
-  screenMesh.position.z = 0.045;
-  dashGroup.add(screenMesh);
+  // Border frame using EdgesGeometry
+  const edgesGeo = new THREE.EdgesGeometry(monitorGeo);
+  const edgesMat = new THREE.LineBasicMaterial({ color: 0x6366f1, linewidth: 1 });
+  const edgesMesh = new THREE.LineSegments(edgesGeo, edgesMat);
+  dashGroup.add(edgesMesh);
 
   dashGroup.position.set(1.2, 0, 0);
   scene.add(dashGroup);
@@ -935,9 +866,9 @@ import * as THREE from 'three';
   const nodesGroup = new THREE.Group();
   scene.add(nodesGroup);
 
-  const nodeMat1 = new THREE.MeshBasicMaterial({ color: 0x6366f1 });
-  const nodeMat2 = new THREE.MeshBasicMaterial({ color: 0x8b5cf6 });
-  const nodeGeo = new THREE.SphereGeometry(0.04, 8, 8);
+  const nodeMat1 = new THREE.MeshStandardMaterial({ color: 0x6366f1, emissive: 0x6366f1, emissiveIntensity: 1.5 });
+  const nodeMat2 = new THREE.MeshStandardMaterial({ color: 0xa78bfa, emissive: 0xa78bfa, emissiveIntensity: 1.5 });
+  const nodeGeo = new THREE.SphereGeometry(0.07, 8, 8);
 
   function initNodes(){
     // Clear existing
@@ -962,7 +893,7 @@ import * as THREE from 'three';
       const vy = (Math.random() - 0.5) * 0.005;
       const vz = (Math.random() - 0.5) * 0.002;
       nodes.push({ x, y, z, vx, vy, vz });
-      const mesh = new THREE.Mesh(nodeGeo, Math.random() > 0.5 ? nodeMat1 : nodeMat2);
+      const mesh = new THREE.Mesh(nodeGeo, Math.random() > 0.4 ? nodeMat1 : nodeMat2);
       mesh.position.set(x, y, z);
       nodesGroup.add(mesh);
       nodeMeshes.push(mesh);
@@ -973,7 +904,7 @@ import * as THREE from 'three';
     linesGeo = new THREE.BufferGeometry();
     linesPositions = new Float32Array(maxConnections * 2 * 3); // 2 vertices per line * 3 coords
     linesGeo.setAttribute('position', new THREE.BufferAttribute(linesPositions, 3));
-    const linesMat = new THREE.LineBasicMaterial({ color: 0x6366f1, opacity: 0.15, transparent: true });
+    const linesMat = new THREE.LineBasicMaterial({ color: 0x6366f1, opacity: 0.35, transparent: true });
     linesMesh = new THREE.LineSegments(linesGeo, linesMat);
     scene.add(linesMesh);
   }
@@ -1062,40 +993,51 @@ import * as THREE from 'three';
   const cubeMesh = new THREE.Mesh(cubeGeo, cubeMat);
   cubeGroup.add(cubeMesh);
 
-  // Face labels as sprites
+  // Face labels as CanvasTexture on PlaneGeometry — no background, just text
   const faceLabels = ['PriorityIQ','ChurnIQ','PricingIQ','A/B Test','Tijarah','FlowIQ'];
-  const facePositions = [
-    [0, 0, 0.6],   // front
-    [0, 0, -0.6],  // back
-    [0.6, 0, 0],   // right
-    [-0.6, 0, 0],  // left
-    [0, 0.6, 0],   // top
-    [0, -0.6, 0]   // bottom
+  // Each face: [position, rotation] — placed on each face of the cube
+  const faceConfigs = [
+    { pos: [0, 0, 0.56], rot: [0, 0, 0] },           // front (+Z)
+    { pos: [0, 0, -0.56], rot: [0, Math.PI, 0] },     // back (-Z)
+    { pos: [0.56, 0, 0], rot: [0, Math.PI/2, 0] },    // right (+X)
+    { pos: [-0.56, 0, 0], rot: [0, -Math.PI/2, 0] },  // left (-X)
+    { pos: [0, 0.56, 0], rot: [-Math.PI/2, 0, 0] },   // top (+Y)
+    { pos: [0, -0.56, 0], rot: [Math.PI/2, 0, 0] }    // bottom (-Y)
   ];
 
-  function createLabelSprite(text){
+  function createFaceLabelTexture(text){
     const c = document.createElement('canvas');
-    c.width = 256; c.height = 64;
+    c.width = 256; c.height = 128;
     const ctx = c.getContext('2d');
-    ctx.clearRect(0, 0, 256, 64);
-    ctx.font = 'bold 28px Inter, sans-serif';
+    // Transparent background — no fill
+    ctx.clearRect(0, 0, 256, 128);
+    ctx.font = 'bold 30px Inter, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#c4b5fd';
+    // Glow
     ctx.shadowColor = '#6366f1';
-    ctx.shadowBlur = 12;
-    ctx.fillText(text, 128, 32);
-    const tex = new THREE.CanvasTexture(c);
-    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0.85 });
-    const sprite = new THREE.Sprite(mat);
-    sprite.scale.set(0.8, 0.2, 1);
-    return sprite;
+    ctx.shadowBlur = 16;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(text, 128, 64);
+    // Draw again for stronger glow
+    ctx.fillText(text, 128, 64);
+    return new THREE.CanvasTexture(c);
   }
 
   faceLabels.forEach(function(label, i){
-    const sprite = createLabelSprite(label);
-    sprite.position.set(facePositions[i][0], facePositions[i][1], facePositions[i][2]);
-    cubeGroup.add(sprite);
+    const tex = createFaceLabelTexture(label);
+    const planeMat = new THREE.MeshBasicMaterial({
+      map: tex,
+      transparent: true,
+      side: THREE.DoubleSide,
+      depthWrite: false
+    });
+    const planeGeo = new THREE.PlaneGeometry(0.9, 0.45);
+    const planeMesh = new THREE.Mesh(planeGeo, planeMat);
+    const cfg = faceConfigs[i];
+    planeMesh.position.set(cfg.pos[0], cfg.pos[1], cfg.pos[2]);
+    planeMesh.rotation.set(cfg.rot[0], cfg.rot[1], cfg.rot[2]);
+    cubeGroup.add(planeMesh);
   });
 
   cubeGroup.position.set(-3.5, 0.5, -1);

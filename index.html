@@ -38,7 +38,13 @@
 <link rel="preconnect" href="https://unpkg.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <script src="https://unpkg.com/lucide@latest"></script>
-<script src="https://unpkg.com/three@0.164.1/build/three.min.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"
+  }
+}
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -756,13 +762,15 @@ if(twEl) {
 </script>
 
 <!-- THREE.JS HERO SCENE -->
-<script>
+<script type="module">
+import * as THREE from 'three';
+
 (function(){
   'use strict';
 
   const canvas = document.getElementById('hero-canvas');
   const hero = document.getElementById('hero');
-  if(!canvas || !hero || typeof THREE === 'undefined') return;
+  if(!canvas || !hero) return;
 
   // --- Responsive breakpoints ---
   function getDeviceType(){
@@ -868,8 +876,19 @@ if(twEl) {
       ctx.fillStyle = grad;
       ctx.shadowColor = col;
       ctx.shadowBlur = 18;
+      // Rounded rect helper (roundRect not universally supported)
+      const rx = 60, ry = barY[i], rw = barWidths[i], rh = 28, rr = 6;
       ctx.beginPath();
-      ctx.roundRect(60, barY[i], barWidths[i], 28, 6);
+      ctx.moveTo(rx + rr, ry);
+      ctx.lineTo(rx + rw - rr, ry);
+      ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + rr);
+      ctx.lineTo(rx + rw, ry + rh - rr);
+      ctx.quadraticCurveTo(rx + rw, ry + rh, rx + rw - rr, ry + rh);
+      ctx.lineTo(rx + rr, ry + rh);
+      ctx.quadraticCurveTo(rx, ry + rh, rx, ry + rh - rr);
+      ctx.lineTo(rx, ry + rr);
+      ctx.quadraticCurveTo(rx, ry, rx + rr, ry);
+      ctx.closePath();
       ctx.fill();
       ctx.shadowBlur = 0;
     });
@@ -1200,6 +1219,7 @@ if(twEl) {
   });
 
 })();
+
 </script>
 </body>
 </html>

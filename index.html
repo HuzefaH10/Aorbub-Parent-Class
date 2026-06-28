@@ -38,6 +38,7 @@
 <link rel="preconnect" href="https://unpkg.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://unpkg.com/three@0.164.1/build/three.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -119,15 +120,9 @@ img{max-width:100%}
 /* HERO */
 #hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
   text-align:center;padding:100px 24px 60px;position:relative;overflow:hidden}
-.hero-orb {
-  position: absolute; top: -150px; left: 50%; transform: translateX(-50%);
-  width: 600px; height: 600px; border-radius: 50%; pointer-events: none;
-  background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
-  animation: orbPulse 4s ease-in-out infinite alternate;
-}
-@keyframes orbPulse {
-  0% { opacity: 0.6; transform: translateX(-50%) scale(1); }
-  100% { opacity: 1; transform: translateX(-50%) scale(1.08); }
+#hero-canvas{
+  position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;
+  pointer-events:none;
 }
 .cursor { color: var(--accent); animation: blink 1s step-end infinite; }
 @keyframes blink { 50% { opacity: 0; } }
@@ -332,7 +327,7 @@ footer{border-top:1px solid var(--border);padding:32px max(40px,5vw);
 
 <!-- HERO -->
 <section id="hero">
-  <div class="hero-orb"></div>
+  <canvas id="hero-canvas"></canvas>
   <div class="hero-content">
     <div class="badge hero-elem d0">
       <span class="badge-dot"></span>
@@ -758,6 +753,453 @@ if(twEl) {
     }, 30);
   }, 2800);
 }
+</script>
+
+<!-- THREE.JS HERO SCENE -->
+<script>
+(function(){
+  'use strict';
+
+  const canvas = document.getElementById('hero-canvas');
+  const hero = document.getElementById('hero');
+  if(!canvas || !hero || typeof THREE === 'undefined') return;
+
+  // --- Responsive breakpoints ---
+  function getDeviceType(){
+    const w = window.innerWidth;
+    if(w < 768) return 'mobile';
+    if(w < 1024) return 'tablet';
+    return 'desktop';
+  }
+  let deviceType = getDeviceType();
+
+  function getNodeCount(){
+    if(deviceType === 'mobile') return 25;
+    if(deviceType === 'tablet') return 40;
+    return 60;
+  }
+
+  // --- Scene, Camera, Renderer ---
+  const scene = new THREE.Scene();
+  // scene.background = null; // transparent — alpha:true handles this
+
+  const camera = new THREE.PerspectiveCamera(60, hero.clientWidth / hero.clientHeight, 0.1, 100);
+  camera.position.z = 6;
+
+  const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(hero.clientWidth, hero.clientHeight);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.2;
+  renderer.shadowMap.enabled = false;
+
+  // --- Lighting ---
+  const ambientLight = new THREE.AmbientLight(0x1a1a2e, 0.4);
+  scene.add(ambientLight);
+
+  const pointLight1 = new THREE.PointLight(0x6366f1, 2, 15);
+  pointLight1.position.set(3, 3, 3);
+  scene.add(pointLight1);
+
+  const pointLight2 = new THREE.PointLight(0x8b5cf6, 1.5, 12);
+  pointLight2.position.set(-4, -2, 2);
+  scene.add(pointLight2);
+
+  const pointLight3 = new THREE.PointLight(0x0ea5e9, 0.8, 10);
+  pointLight3.position.set(0, -4, 1);
+  scene.add(pointLight3);
+
+  // --- Mouse tracking ---
+  const mouse = { x: 0, y: 0 };
+  const mouseNorm = { x: 0, y: 0 }; // -1 to 1
+  const cameraTarget = { x: 0, y: 0 };
+
+  function onMouseMove(e){
+    if(deviceType === 'mobile') return;
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+    mouseNorm.x = (e.clientX / window.innerWidth) * 2 - 1;
+    mouseNorm.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  }
+  window.addEventListener('mousemove', onMouseMove);
+
+  // ============================================================
+  // ELEMENT 1: Floating Dashboard Screen
+  // ============================================================
+  const dashGroup = new THREE.Group();
+
+  // Monitor body
+  const monitorGeo = new THREE.BoxGeometry(3.2, 2, 0.08);
+  const monitorMat = new THREE.MeshStandardMaterial({
+    color: 0x0f0f1a, metalness: 0.8, roughness: 0.2
+  });
+  const monitorMesh = new THREE.Mesh(monitorGeo, monitorMat);
+  dashGroup.add(monitorMesh);
+
+  // Screen face — canvas texture
+  function createScreenTexture(){
+    const c = document.createElement('canvas');
+    c.width = 512; c.height = 320;
+    const ctx = c.getContext('2d');
+
+    // Background
+    ctx.fillStyle = '#0a0a14';
+    ctx.fillRect(0, 0, 512, 320);
+
+    // Grid of dots
+    ctx.fillStyle = 'rgba(99,102,241,0.08)';
+    for(let gx = 20; gx < 500; gx += 24){
+      for(let gy = 20; gy < 310; gy += 24){
+        ctx.beginPath();
+        ctx.arc(gx, gy, 1.2, 0, Math.PI*2);
+        ctx.fill();
+      }
+    }
+
+    // 3 horizontal glowing bars (chart bars)
+    const barColors = ['#6366f1','#8b5cf6','#6366f1'];
+    const barWidths = [260, 180, 320];
+    const barY = [100, 155, 210];
+    barColors.forEach(function(col, i){
+      // Glow
+      const grad = ctx.createLinearGradient(60, barY[i], 60 + barWidths[i], barY[i]);
+      grad.addColorStop(0, col);
+      grad.addColorStop(1, col + '44');
+      ctx.fillStyle = grad;
+      ctx.shadowColor = col;
+      ctx.shadowBlur = 18;
+      ctx.beginPath();
+      ctx.roundRect(60, barY[i], barWidths[i], 28, 6);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    });
+
+    // 2 circle indicators top-right
+    ctx.fillStyle = '#6366f1';
+    ctx.shadowColor = '#6366f1';
+    ctx.shadowBlur = 10;
+    ctx.beginPath(); ctx.arc(420, 50, 8, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#8b5cf6';
+    ctx.shadowColor = '#8b5cf6';
+    ctx.beginPath(); ctx.arc(455, 50, 8, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Thin horizontal line at top
+    ctx.strokeStyle = 'rgba(99,102,241,0.2)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(40, 75); ctx.lineTo(472, 75); ctx.stroke();
+
+    return new THREE.CanvasTexture(c);
+  }
+
+  const screenGeo = new THREE.PlaneGeometry(3.0, 1.85);
+  const screenMat = new THREE.MeshStandardMaterial({
+    map: createScreenTexture(),
+    emissive: 0x6366f1,
+    emissiveIntensity: 0.15,
+    roughness: 0.5,
+    metalness: 0.1
+  });
+  const screenMesh = new THREE.Mesh(screenGeo, screenMat);
+  screenMesh.position.z = 0.045;
+  dashGroup.add(screenMesh);
+
+  dashGroup.position.set(1.2, 0, 0);
+  scene.add(dashGroup);
+
+  // ============================================================
+  // ELEMENT 2: Connected Nodes Network
+  // ============================================================
+  let NODE_COUNT = getNodeCount();
+  let nodes = [];
+  let nodeMeshes = [];
+  const nodesGroup = new THREE.Group();
+  scene.add(nodesGroup);
+
+  const nodeMat1 = new THREE.MeshBasicMaterial({ color: 0x6366f1 });
+  const nodeMat2 = new THREE.MeshBasicMaterial({ color: 0x8b5cf6 });
+  const nodeGeo = new THREE.SphereGeometry(0.04, 8, 8);
+
+  function initNodes(){
+    // Clear existing
+    while(nodesGroup.children.length > 0){
+      const child = nodesGroup.children[0];
+      nodesGroup.remove(child);
+      if(child.geometry) child.geometry.dispose();
+    }
+    if(linesMesh){
+      scene.remove(linesMesh);
+      linesGeo.dispose();
+    }
+    nodes = [];
+    nodeMeshes = [];
+    NODE_COUNT = getNodeCount();
+
+    for(let i = 0; i < NODE_COUNT; i++){
+      const x = (Math.random() - 0.5) * 24; // -12 to 12
+      const y = (Math.random() - 0.5) * 12; // -6 to 6
+      const z = -2 - Math.random() * 6;     // -8 to -2
+      const vx = (Math.random() - 0.5) * 0.005;
+      const vy = (Math.random() - 0.5) * 0.005;
+      const vz = (Math.random() - 0.5) * 0.002;
+      nodes.push({ x, y, z, vx, vy, vz });
+      const mesh = new THREE.Mesh(nodeGeo, Math.random() > 0.5 ? nodeMat1 : nodeMat2);
+      mesh.position.set(x, y, z);
+      nodesGroup.add(mesh);
+      nodeMeshes.push(mesh);
+    }
+
+    // Connections — pre-calculate nearest neighbors
+    const maxConnections = NODE_COUNT * 3; // max 3 per node
+    linesGeo = new THREE.BufferGeometry();
+    linesPositions = new Float32Array(maxConnections * 2 * 3); // 2 vertices per line * 3 coords
+    linesGeo.setAttribute('position', new THREE.BufferAttribute(linesPositions, 3));
+    const linesMat = new THREE.LineBasicMaterial({ color: 0x6366f1, opacity: 0.15, transparent: true });
+    linesMesh = new THREE.LineSegments(linesGeo, linesMat);
+    scene.add(linesMesh);
+  }
+
+  let linesGeo = null;
+  let linesMesh = null;
+  let linesPositions = null;
+
+  initNodes();
+
+  function updateNodes(){
+    // Move nodes
+    for(let i = 0; i < nodes.length; i++){
+      const n = nodes[i];
+      n.x += n.vx;
+      n.y += n.vy;
+      n.z += n.vz;
+
+      // Bounce off boundaries
+      if(n.x < -12 || n.x > 12) n.vx *= -1;
+      if(n.y < -6 || n.y > 6) n.vy *= -1;
+      if(n.z < -8 || n.z > -2) n.vz *= -1;
+
+      // Mouse repulsion (project mouse to 3D rough coords)
+      if(deviceType !== 'mobile'){
+        const mx = mouseNorm.x * 6;
+        const my = mouseNorm.y * 3;
+        const dx = n.x - mx;
+        const dy = n.y - my;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if(dist < 2 && dist > 0.01){
+          const force = (2 - dist) * 0.002;
+          n.x += (dx / dist) * force;
+          n.y += (dy / dist) * force;
+        }
+      }
+
+      nodeMeshes[i].position.set(n.x, n.y, n.z);
+    }
+
+    // Update lines — connect each node to 2-3 nearest
+    let lineIdx = 0;
+    const maxLineVerts = linesPositions.length / 3;
+    for(let i = 0; i < nodes.length; i++){
+      // Find 3 nearest neighbors
+      let dists = [];
+      for(let j = 0; j < nodes.length; j++){
+        if(i === j) continue;
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
+        const dz = nodes[i].z - nodes[j].z;
+        dists.push({ j: j, d: dx*dx + dy*dy + dz*dz });
+      }
+      dists.sort(function(a,b){ return a.d - b.d; });
+      const connectCount = Math.min(2 + (i % 2), dists.length); // 2 or 3
+      for(let k = 0; k < connectCount; k++){
+        if(dists[k].d > 16) continue; // max distance squared = 4 units
+        if(lineIdx + 1 >= maxLineVerts) break;
+        const ni = nodes[i];
+        const nj = nodes[dists[k].j];
+        linesPositions[lineIdx * 3] = ni.x;
+        linesPositions[lineIdx * 3 + 1] = ni.y;
+        linesPositions[lineIdx * 3 + 2] = ni.z;
+        lineIdx++;
+        linesPositions[lineIdx * 3] = nj.x;
+        linesPositions[lineIdx * 3 + 1] = nj.y;
+        linesPositions[lineIdx * 3 + 2] = nj.z;
+        lineIdx++;
+      }
+    }
+    // Zero out remaining
+    for(let i = lineIdx * 3; i < linesPositions.length; i++){
+      linesPositions[i] = 0;
+    }
+    linesGeo.attributes.position.needsUpdate = true;
+    linesGeo.setDrawRange(0, lineIdx);
+  }
+
+  // ============================================================
+  // ELEMENT 3: Rotating Wireframe Cube with Labels
+  // ============================================================
+  const cubeGroup = new THREE.Group();
+
+  const cubeGeo = new THREE.BoxGeometry(1.1, 1.1, 1.1);
+  const cubeMat = new THREE.MeshBasicMaterial({ color: 0x6366f1, wireframe: true });
+  const cubeMesh = new THREE.Mesh(cubeGeo, cubeMat);
+  cubeGroup.add(cubeMesh);
+
+  // Face labels as sprites
+  const faceLabels = ['PriorityIQ','ChurnIQ','PricingIQ','A/B Test','Tijarah','FlowIQ'];
+  const facePositions = [
+    [0, 0, 0.6],   // front
+    [0, 0, -0.6],  // back
+    [0.6, 0, 0],   // right
+    [-0.6, 0, 0],  // left
+    [0, 0.6, 0],   // top
+    [0, -0.6, 0]   // bottom
+  ];
+
+  function createLabelSprite(text){
+    const c = document.createElement('canvas');
+    c.width = 256; c.height = 64;
+    const ctx = c.getContext('2d');
+    ctx.clearRect(0, 0, 256, 64);
+    ctx.font = 'bold 28px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#c4b5fd';
+    ctx.shadowColor = '#6366f1';
+    ctx.shadowBlur = 12;
+    ctx.fillText(text, 128, 32);
+    const tex = new THREE.CanvasTexture(c);
+    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0.85 });
+    const sprite = new THREE.Sprite(mat);
+    sprite.scale.set(0.8, 0.2, 1);
+    return sprite;
+  }
+
+  faceLabels.forEach(function(label, i){
+    const sprite = createLabelSprite(label);
+    sprite.position.set(facePositions[i][0], facePositions[i][1], facePositions[i][2]);
+    cubeGroup.add(sprite);
+  });
+
+  cubeGroup.position.set(-3.5, 0.5, -1);
+  scene.add(cubeGroup);
+
+  // Cube hover state
+  let cubeHovered = false;
+  let cubeGlowTimer = 0;
+  const raycaster = new THREE.Raycaster();
+  const rayMouse = new THREE.Vector2();
+
+  // Hide cube on mobile
+  if(deviceType === 'mobile'){
+    cubeGroup.visible = false;
+  }
+
+  // ============================================================
+  // ANIMATION LOOP
+  // ============================================================
+  const clock = new THREE.Clock();
+  let animFrameId = null;
+
+  function animate(){
+    animFrameId = requestAnimationFrame(animate);
+    const elapsed = clock.getElapsedTime();
+    const dt = clock.getDelta();
+
+    // --- Dashboard floating animation ---
+    dashGroup.position.y = Math.sin(elapsed * (2 * Math.PI / 3)) * 0.15;
+    dashGroup.rotation.y = Math.sin(elapsed * (2 * Math.PI / 6)) * (8 * Math.PI / 180);
+
+    // Mouse tilt on dashboard
+    if(deviceType !== 'mobile'){
+      const targetRotX = -mouseNorm.y * (5 * Math.PI / 180);
+      const targetRotZ = mouseNorm.x * (3 * Math.PI / 180);
+      dashGroup.rotation.x += (targetRotX - dashGroup.rotation.x) * 0.05;
+      dashGroup.rotation.z += (targetRotZ - dashGroup.rotation.z) * 0.05;
+    }
+
+    // --- Nodes update ---
+    updateNodes();
+
+    // --- Cube rotation ---
+    if(cubeGroup.visible){
+      const rotSpeed = cubeHovered ? 3 : 1;
+      cubeGroup.rotation.x += 0.003 * rotSpeed;
+      cubeGroup.rotation.y += 0.005 * rotSpeed;
+
+      // Pulsing scale
+      const pulse = 1 + Math.sin(elapsed * (2 * Math.PI / 4)) * 0.03;
+      cubeGroup.scale.set(pulse, pulse, pulse);
+
+      // Glow timer
+      if(cubeGlowTimer > 0){
+        cubeGlowTimer -= 0.016;
+        cubeMat.color.setHex(0xa78bfa);
+      } else {
+        cubeMat.color.setHex(0x6366f1);
+      }
+
+      // Raycaster for cube hover
+      if(deviceType !== 'mobile'){
+        rayMouse.x = mouseNorm.x;
+        rayMouse.y = mouseNorm.y;
+        raycaster.setFromCamera(rayMouse, camera);
+        const intersects = raycaster.intersectObject(cubeMesh);
+        if(intersects.length > 0){
+          if(!cubeHovered){
+            cubeHovered = true;
+            cubeGlowTimer = 1.0;
+          }
+        } else {
+          cubeHovered = false;
+        }
+      }
+    }
+
+    // --- Camera parallax ---
+    if(deviceType !== 'mobile'){
+      cameraTarget.x = mouseNorm.x * 0.4;
+      cameraTarget.y = mouseNorm.y * 0.4;
+      camera.position.x += (cameraTarget.x - camera.position.x) * 0.02;
+      camera.position.y += (cameraTarget.y - camera.position.y) * 0.02;
+      camera.lookAt(0, 0, 0);
+    }
+
+    renderer.render(scene, camera);
+  }
+
+  animate();
+
+  // --- Resize handler ---
+  function onResize(){
+    const prevDevice = deviceType;
+    deviceType = getDeviceType();
+    const w = hero.clientWidth;
+    const h = hero.clientHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+
+    // Handle responsive changes
+    if(prevDevice !== deviceType){
+      cubeGroup.visible = deviceType !== 'mobile';
+      if(prevDevice !== deviceType){
+        initNodes(); // reinitialize with correct count
+      }
+      if(deviceType === 'mobile'){
+        camera.position.x = 0;
+        camera.position.y = 0;
+        camera.lookAt(0, 0, 0);
+      }
+    }
+  }
+  window.addEventListener('resize', onResize);
+
+  // --- Cleanup on page unload ---
+  window.addEventListener('beforeunload', function(){
+    cancelAnimationFrame(animFrameId);
+    renderer.dispose();
+  });
+
+})();
 </script>
 </body>
 </html>
